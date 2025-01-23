@@ -1,1 +1,3 @@
-# go-boilerplate
+# Go Boilerplate
+## Hexagonal Architecture
+### using Echo Framework

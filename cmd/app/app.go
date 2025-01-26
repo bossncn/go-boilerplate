@@ -44,7 +44,7 @@ func Run(cfg *config.Config) {
 	}(logger)
 
 	// Init App Server
-	server := http.NewHTTPServer(mdw, repo, handler, service)
+	server := http.NewHTTPServer(cfg, mdw, repo, handler, service)
 
 	if err != nil {
 		logger.Fatal("Failed to initialize server", zap.Error(err))

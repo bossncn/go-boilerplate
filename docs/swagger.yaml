@@ -1,0 +1,11 @@
+info:
+  contact: {}
+  description: Template for init projects
+  license:
+    name: MIT
+    url: https://github.com/bossncn/go-boilerplate/blob/main/LICENSE
+  termsOfService: http://swagger.io/terms/
+  title: Go Boilerplate
+  version: "1.0"
+paths: {}
+swagger: "2.0"

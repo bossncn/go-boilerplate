@@ -7,6 +7,7 @@ This is a simple Go boilerplate application designed to demonstrate the Hexagona
 - **Go Boilerplate**: A basic structure to get started with a clean, organized Go project.
 - **Hexagonal Architecture**: Clear separation between core business logic and external systems (HTTP, databases).
 - **Echo Framework**: Uses the Echo framework for HTTP server and routing.
+- **Swagger Documentation**: Auto-generated OpenAPI documentation with [swaggo/swag](https://github.com/swaggo/swag).
 - **Zap Logger**: Efficient and structured logging with the [Zap](https://github.com/uber-go/zap) logging library.
 - **Docker Support**: Easy Docker integration for running the application in containers.
 - **Unit & Integration Tests**: Tests for ensuring functionality and integration across the system.
@@ -53,6 +54,86 @@ By separating these concerns into distinct layers, it becomes much easier to wri
 
 In this setup, the core logic is always isolated from the external systems, making it easier to maintain and test. The adapters allow external systems to interact with the core logic without tightly coupling the application to any particular implementation.
 
+---
+
+## Swagger Auto-Generation
+
+Swagger provides an interactive API documentation interface. This project uses `swaggo/swag` to auto-generate Swagger documentation.
+
+### Setup Swagger in the Project
+
+1. **Install swag CLI**
+
+   Install the `swag` command-line tool for generating Swagger documentation:
+
+   ```bash
+   go install github.com/swaggo/swag/cmd/swag@latest
+   ```
+
+2. **Add Swagger Middleware**
+
+   Add the Echo middleware for serving Swagger UI:
+
+   ```bash
+   go get -u github.com/swaggo/echo-swagger
+   ```
+
+3. **Generate Swagger Documentation**
+
+   Run the following command to generate Swagger documentation from your code comments:
+
+   ```bash
+   swag init -g cmd/main.go
+   ```
+
+   This will generate a `docs` folder containing `docs.go` and `swagger.json`.
+
+4. **Serve Swagger UI**
+
+   In your `cmd/app/app.go`, add the following code to serve Swagger documentation:
+
+   ```go
+   import (
+       echoSwagger "github.com/swaggo/echo-swagger"
+       _ "github.com/bossncn/go-boilerplate/docs" // Import Swagger docs
+   )
+
+   func RegisterRoutes(e *echo.Echo) {
+       e.GET("/swagger/*", echoSwagger.WrapHandler)
+   }
+   ```
+
+5. **Annotate Your Handlers**
+
+   Add comments to your handler functions to define API endpoints. For example:
+
+   ```go
+   // GetUser godoc
+   // @Summary Get a user by ID
+   // @Description Fetch a user by their unique ID
+   // @Tags Users
+   // @Accept json
+   // @Produce json
+   // @Param id path string true "User ID"
+   // @Success 200 {object} core.User
+   // @Failure 404 {object} map[string]string
+   // @Router /user/{id} [get]
+   func (h *UserHandler) GetUser(c echo.Context) error {
+       id := c.Param("id")
+       user, err := h.userService.GetUser(id)
+       if err != nil {
+           return c.JSON(http.StatusNotFound, map[string]string{"message": "User not found"})
+       }
+       return c.JSON(http.StatusOK, user)
+   }
+   ```
+
+6. **View Swagger UI**
+
+   Run the application and navigate to `http://localhost:8080/swagger/index.html` to view the Swagger UI.
+
+---
+
 ## Getting Started
 
 ### Prerequisites
@@ -94,6 +175,7 @@ Here are the available `make` commands you can use to manage the project:
 - **`make go-format`**: Formats all Go code.
 - **`make docker-build`**: Builds the Docker image for the application.
 - **`make docker-clean`**: Cleans up the Docker image.
+- **`make generate-docs`**: Generate Swagger documents.
 
 ### Project Structure
 
@@ -104,6 +186,7 @@ Here are the available `make` commands you can use to manage the project:
 │   │   └── app             # Core application components for HTTP setup and dependency injection
 │   └── main                # Runs the application (starts the HTTP server initialized in 'app')
 ├── config                  # Configuration files for the app (e.g., environment variables, settings)
+├── docs                    # Swagger document files
 ├── internal
 │   ├── adapter             # Implementations of external systems (e.g., HTTP, DB adapters)
 │   │   ├── http            # HTTP handler implementations using Echo framework

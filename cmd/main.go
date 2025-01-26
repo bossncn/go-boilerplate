@@ -6,6 +6,13 @@ import (
 	"github.com/bossncn/go-boilerplate/config"
 )
 
+// @title Go Boilerplate
+// @version 1.0
+// @description Template for init projects
+// @termsOfService http://swagger.io/terms/
+//
+// @license.name MIT
+// @license.url https://github.com/bossncn/go-boilerplate/blob/main/LICENSE
 func main() {
 	cfg, err := config.LoadConfig()
 

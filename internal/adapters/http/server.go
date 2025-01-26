@@ -2,8 +2,10 @@ package http
 
 import (
 	"github.com/bossncn/go-boilerplate/config"
+	_ "github.com/bossncn/go-boilerplate/docs"
 	"github.com/bossncn/go-boilerplate/internal/middleware"
 	"github.com/labstack/echo/v4"
+	echoSwagger "github.com/swaggo/echo-swagger"
 	"go.uber.org/zap"
 	"net/http"
 )
@@ -43,10 +45,17 @@ type ServerHttp struct {
 	app *echo.Echo
 }
 
-func NewHTTPServer(middleware *Middleware, repository *Repository, handler *Handler, service *Service) *ServerHttp {
+func NewHTTPServer(cfg *config.Config, middleware *Middleware, repository *Repository, handler *Handler, service *Service) *ServerHttp {
 	e := echo.New()
 	e.Use(middleware.Logger)
+
+	// Healthcheck
 	e.GET("/", func(c echo.Context) error { return c.String(http.StatusOK, "Healthy") })
+
+	// Swagger
+	if cfg.AppEnv == "development" {
+		e.GET("/swagger/*", echoSwagger.WrapHandler)
+	}
 
 	return &ServerHttp{
 		app: e,
